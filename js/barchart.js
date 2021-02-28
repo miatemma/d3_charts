@@ -46,7 +46,7 @@ d3.json(
     .scaleLinear()
     .domain([0, d3.max(gdp) * 1.1])
     .range([height, 0]);
-  var y_axis = d3.axisLeft().scale(yscale_reverse);
+  var y_axis = d3.axisLeft(yscale_reverse);
 
   var yearsDate = data.map((el) => new Date(el.date));
   var xMax = new Date(d3.max(yearsDate));
@@ -56,9 +56,8 @@ d3.json(
     .domain([d3.min(yearsDate), xMax])
     .range([0, width]);
 
-  var x_axis = d3.axisBottom().scale(xscale);
+  var x_axis = d3.axisBottom(xscale);
   var scaledDate = data.map((el) => xscale(new Date(el.date)));
-  console.log(scaledDate);
 
   svgContainer
     .append("g")
@@ -73,7 +72,6 @@ d3.json(
     .attr("transform", "translate(80, 0)");
 
   var barwidth = width / 275;
-  console.log(barwidth);
 
   d3.select("svg")
     .selectAll("rect")
@@ -92,8 +90,6 @@ d3.json(
     .attr("transform", "translate(80, 0)")
     .on("mouseover", function (event, d) {
       tooltip.transition().duration(200).style("opacity", 0.9);
-      console.log(event);
-      console.log(d);
       tooltip
         .attr("data-date", d.date)
         .html(formatText(d.date) + "<br>" + d.gdp + " USD")
@@ -109,9 +105,7 @@ d3.json(
 });
 
 function formatText(str) {
-  console.log(str);
   arr = str.split('-');
-  console.log(arr);
   switch (arr[1]) {
     case "01": case "02": case "03":
       return (arr[0] + ", Q1");

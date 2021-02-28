@@ -2,159 +2,202 @@
 /* eslint-disable max-len */
 
 // eslint-disable-next-line no-unused-vars
-const projectName = 'bar-chart';
+var projectName = 'scatter-plot';
 
-// coded by @Christian-Paul
+// RETURN TO GIDCDN link once chances propogate
 
-var width = 800,
-  height = 400,
-  barWidth = width / 275;
+// coded by @paycoguy
 
-var tooltip = d3
-  .select('.visHolder')
+var url =
+  'https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/cyclist-data.json';
+var margin = {
+    top: 100,
+    right: 20,
+    bottom: 30,
+    left: 60
+  },
+  width = 920 - margin.left - margin.right,
+  height = 630 - margin.top - margin.bottom;
+
+var x = d3.scaleLinear().range([0, width]);
+
+var y = d3.scaleTime().range([0, height]);
+
+var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+var timeFormat = d3.timeFormat('%M:%S');
+var xAxis = d3.axisBottom(x).tickFormat(d3.format('d'));
+
+var yAxis = d3.axisLeft(y).tickFormat(timeFormat);
+
+// Define the div for the tooltip
+var div = d3
+  .select('body')
   .append('div')
+  .attr('class', 'tooltip')
   .attr('id', 'tooltip')
-
-var overlay = d3
-  .select('.visHolder')
-  .append('div')
-  .attr('class', 'overlay')
   .style('opacity', 0);
 
-var svgContainer = d3
-  .select('.visHolder')
+var svg = d3
+  .select('body')
   .append('svg')
-  .attr('width', width + 100)
-  .attr('height', height + 60);
+  .attr('width', width + margin.left + margin.right)
+  .attr('height', height + margin.top + margin.bottom)
+  .attr('class', 'graph')
+  .append('g')
+  .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-d3.json(
-  'https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json',
-  function (e, data) {
-    svgContainer
-      .append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('x', -200)
-      .attr('y', 80)
-      .text('Gross Domestic Product');
-
-    svgContainer
-      .append('text')
-      .attr('x', width / 2 + 120)
-      .attr('y', height + 50)
-      .text('More Information: http://www.bea.gov/national/pdf/nipaguid.pdf')
-      .attr('class', 'info');
-
-    var years = data.data.map(function (item) {
-      var quarter;
-      var temp = item[0].substring(5, 7);
-
-      if (temp === '01') {
-        quarter = 'Q1';
-      } else if (temp === '04') {
-        quarter = 'Q2';
-      } else if (temp === '07') {
-        quarter = 'Q3';
-      } else if (temp === '10') {
-        quarter = 'Q4';
-      }
-
-      return item[0].substring(0, 4) + ' ' + quarter;
-    });
-
-    var yearsDate = data.data.map(function (item) {
-      return new Date(item[0]);
-    });
-
-    var xMax = new Date(d3.max(yearsDate));
-    xMax.setMonth(xMax.getMonth() + 3);
-    var xScale = d3
-      .scaleTime()
-      .domain([d3.min(yearsDate), xMax])
-      .range([0, width]);
-
-    var xAxis = d3.axisBottom().scale(xScale);
-
-    svgContainer
-      .append('g')
-      .call(xAxis)
-      .attr('id', 'x-axis')
-      .attr('transform', 'translate(60, 400)');
-
-    var GDP = data.data.map(function (item) {
-      return item[1];
-    });
-
-    var scaledGDP = [];
-
-    var gdpMax = d3.max(GDP);
-
-    var linearScale = d3.scaleLinear().domain([0, gdpMax]).range([0, height]);
-
-    scaledGDP = GDP.map(function (item) {
-      return linearScale(item);
-    });
-
-    var yAxisScale = d3.scaleLinear().domain([0, gdpMax]).range([height, 0]);
-
-    var yAxis = d3.axisLeft(yAxisScale);
-
-    svgContainer
-      .append('g')
-      .call(yAxis)
-      .attr('id', 'y-axis')
-      .attr('transform', 'translate(60, 0)');
-
-    d3.select('svg')
-      .selectAll('rect')
-      .data(scaledGDP)
-      .enter()
-      .append('rect')
-      .attr('data-date', function (d, i) {
-        return data.data[i][0];
-      })
-      .attr('data-gdp', function (d, i) {
-        return data.data[i][1];
-      })
-      .attr('class', 'bar')
-      .attr('x', function (d, i) {
-        return xScale(yearsDate[i]);
-      })
-      .attr('y', function (d) {
-        return height - d;
-      })
-      .attr('width', barWidth)
-      .attr('height', function (d) {
-        return d;
-      })
-      .style('fill', '#33adff')
-      .attr('transform', 'translate(60, 0)')
-      .on('mouseover', function (d, i) {
-        overlay
-          .transition()
-          .duration(0)
-          .style('height', d + 'px')
-          .style('width', barWidth + 'px')
-          .style('opacity', 0.9)
-          .style('left', i * barWidth + 0 + 'px')
-          .style('top', height - d + 'px')
-          .style('transform', 'translateX(60px)');
-        tooltip.transition().duration(200).style('opacity', 0.9);
-        tooltip
-          .html(
-            years[i] +
-              '<br>' +
-              '$' +
-              GDP[i].toFixed(1).replace(/(\d)(?=(\d{3})+\.)/g, '$1,') +
-              ' Billion'
-          )
-          .attr('data-date', data.data[i][0])
-          .style('left', i * barWidth + 30 + 'px')
-          .style('top', height - 100 + 'px')
-          .style('transform', 'translateX(60px)');
-      })
-      .on('mouseout', function () {
-        tooltip.transition().duration(200).style('opacity', 0);
-        overlay.transition().duration(200).style('opacity', 0);
-      });
+d3.json(url, function (error, data) {
+  if (error) {
+    throw error;
   }
-);
+  data.forEach(function (d) {
+    d.Place = +d.Place;
+    var parsedTime = d.Time.split(':');
+    d.Time = new Date(Date.UTC(1970, 0, 1, 0, parsedTime[0], parsedTime[1]));
+  });
+
+  x.domain([
+    d3.min(data, function (d) {
+      return d.Year - 1;
+    }),
+    d3.max(data, function (d) {
+      return d.Year + 1;
+    })
+  ]);
+  y.domain(
+    d3.extent(data, function (d) {
+      return d.Time;
+    })
+  );
+
+  svg
+    .append('g')
+    .attr('class', 'x axis')
+    .attr('id', 'x-axis')
+    .attr('transform', 'translate(0,' + height + ')')
+    .call(xAxis)
+    .append('text')
+    .attr('class', 'x-axis-label')
+    .attr('x', width)
+    .attr('y', -6)
+    .style('text-anchor', 'end')
+    .text('Year');
+
+  svg
+    .append('g')
+    .attr('class', 'y axis')
+    .attr('id', 'y-axis')
+    .call(yAxis)
+    .append('text')
+    .attr('class', 'label')
+    .attr('transform', 'rotate(-90)')
+    .attr('y', 6)
+    .attr('dy', '.71em')
+    .style('text-anchor', 'end')
+    .text('Best Time (minutes)');
+
+  svg
+    .append('text')
+    .attr('transform', 'rotate(-90)')
+    .attr('x', -160)
+    .attr('y', -44)
+    .style('font-size', 18)
+    .text('Time in Minutes');
+
+  svg
+    .selectAll('.dot')
+    .data(data)
+    .enter()
+    .append('circle')
+    .attr('class', 'dot')
+    .attr('r', 6)
+    .attr('cx', function (d) {
+      return x(d.Year);
+    })
+    .attr('cy', function (d) {
+      return y(d.Time);
+    })
+    .attr('data-xvalue', function (d) {
+      return d.Year;
+    })
+    .attr('data-yvalue', function (d) {
+      return d.Time.toISOString();
+    })
+    .style('fill', function (d) {
+      return color(d.Doping !== '');
+    })
+    .on('mouseover', function (d) {
+      div.style('opacity', 0.9);
+      div.attr('data-year', d.Year);
+      div
+        .html(
+          d.Name +
+            ': ' +
+            d.Nationality +
+            '<br/>' +
+            'Year: ' +
+            d.Year +
+            ', Time: ' +
+            timeFormat(d.Time) +
+            (d.Doping ? '<br/><br/>' + d.Doping : '')
+        )
+        .style('left', d3.event.pageX + 'px')
+        .style('top', d3.event.pageY - 28 + 'px');
+    })
+    .on('mouseout', function () {
+      div.style('opacity', 0);
+    });
+
+  // title
+  svg
+    .append('text')
+    .attr('id', 'title')
+    .attr('x', width / 2)
+    .attr('y', 0 - margin.top / 2)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '30px')
+    .text('Doping in Professional Bicycle Racing');
+
+  // subtitle
+  svg
+    .append('text')
+    .attr('x', width / 2)
+    .attr('y', 0 - margin.top / 2 + 25)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '20px')
+    .text("35 Fastest times up Alpe d'Huez");
+
+  var legendContainer = svg.append('g').attr('id', 'legend');
+
+  var legend = legendContainer
+    .selectAll('#legend')
+    .data(color.domain())
+    .enter()
+    .append('g')
+    .attr('class', 'legend-label')
+    .attr('transform', function (d, i) {
+      return 'translate(0,' + (height / 2 - i * 20) + ')';
+    });
+
+  legend
+    .append('rect')
+    .attr('x', width - 18)
+    .attr('width', 18)
+    .attr('height', 18)
+    .style('fill', color);
+
+  legend
+    .append('text')
+    .attr('x', width - 24)
+    .attr('y', 9)
+    .attr('dy', '.35em')
+    .style('text-anchor', 'end')
+    .text(function (d) {
+      if (d) {
+        return 'Riders with doping allegations';
+      } else {
+        return 'No doping allegations';
+      }
+    });
+});
