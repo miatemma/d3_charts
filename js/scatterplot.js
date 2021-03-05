@@ -95,7 +95,6 @@ d3.json(
   var legendContainer = d3.select("svg")
     .append("g")
     .attr("id", "legend")
-    .attr("border", "1px solid grey");
 
   var legend = legendContainer
     .selectAll("#legend")
