@@ -20,12 +20,6 @@ d3.json(
   "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json"
 ).then((data) => {
 
-  console.log(data);5,50
-  6,50
-  6,00
-  4,50
-  3,50
-  
   var globalData = new Array(12);
 
   var monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -40,7 +34,7 @@ d3.json(
   var tempMin = d3.min(temp);
   var tempMax = d3.max(temp);
   var diff = (tempMax - tempMin) / colors.length;
-  tempscale = colors.map( (el, i) => ( tempMin + i*diff));
+  tempscale = colors.map((el, i) => (tempMin + i * diff));
   console.log(tempscale);
 
   var len = globalData[0].length;
@@ -119,15 +113,15 @@ d3.json(
     .attr("class", "legend-label")
   legend
     .append("rect")
-    .attr("x", (d, i) => 100 + 45*i)
-    .attr("y", height + 50 )
-    .attr("width", 45 )
-    .attr("height", 10 )
+    .attr("x", (d, i) => 100 + 45 * i)
+    .attr("y", height + 50)
+    .attr("width", 45)
+    .attr("height", 10)
     .style("fill", (d) => d);
   legend
     .append("text")
-    .attr("x", (d, i) => 100 + 45*i )
-    .attr("y", height + 70 )
+    .attr("x", (d, i) => 100 + 45 * i)
+    .attr("y", height + 70)
     .attr("font-size", "10px")
     .text((d, i) => (tempscale[i]).toFixed(1) + "°C");
 
