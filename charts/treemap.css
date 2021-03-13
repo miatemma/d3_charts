@@ -1,0 +1,59 @@
+.main {
+  min-height: 1200px;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Roboto";
+  background-color: #708090;
+  background-size: 64px 128px;
+}
+.main .container {
+  height: 850px;
+  width: 1000px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 20px 20px;
+  align-self: center;
+  position: relative;
+}
+@media (min-width: 1000px) {
+  .main .container {
+    box-shadow: 2px 2px 20px;
+  }
+}
+.main .container #title {
+  text-align: center;
+  font-size: 1.5em;
+}
+.main .container .visHolder {
+  position: absolute;
+  top: 11em;
+}
+
+#tooltip {
+  position: absolute;
+  text-align: center;
+  width: 500px;
+  height: 50px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background:whitesmoke;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+#description {
+  text-align: left;
+  font-size: 0.8em;
+  padding-top: 2em;
+  padding-bottom: 2em;
+  padding-left: 4em;
+}
+
+#visHolder {
+  padding-left: 50px;
+  padding-top: 50px;
+}

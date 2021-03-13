@@ -1,3 +1,4 @@
+
 var countyData = [];
 var educationData = [];
 var promises = [];
